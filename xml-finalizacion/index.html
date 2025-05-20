@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Convertidor XML - Finalización de Grupos Formativos</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Finalización de Grupos Formativos - Convertidor XML</h1>
+    <p>Sube tu archivo Excel (.xlsx) con el formato de FUNDAE para generar el XML.</p>
+    <input type="file" id="excelFile" accept=".xlsx">
+    <button onclick="convertToXML()">Convertir a XML</button>
+    <pre id="output"></pre>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
