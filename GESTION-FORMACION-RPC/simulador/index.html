@@ -3,19 +3,18 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Simulador XML Finalización FUNDAE</title>
+    <title>Simulador XML Finalización - RPC</title>
     <link rel="stylesheet" href="style.css">
-    <script src="libs/xlsx.full.min.js"></script>
-    <script defer src="script.js"></script>
 </head>
 <body>
     <div class="container">
-        <h1>Simulador XML Finalización FUNDAE</h1>
-        <p>Sube tu plantilla Excel para generar automáticamente el XML compatible con FUNDAE.</p>
+        <h1>Simulador XML Finalización de Grupos (FUNDAE)</h1>
+        <p>Sube tu archivo Excel con los datos del grupo y descarga un XML válido para subir a FUNDAE.</p>
         <input type="file" id="excelFile" accept=".xlsx">
-        <button onclick="convertToXML()">Convertir a XML</button>
-        <a id="downloadLink" style="display:none;" download="finalizacion.xml">Descargar XML</a>
-        <pre id="output"></pre>
+        <button onclick="generarXML()">Generar XML</button>
+        <a id="downloadLink" style="display:none;">Descargar XML</a>
     </div>
+    <script src="xlsx.full.min.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
