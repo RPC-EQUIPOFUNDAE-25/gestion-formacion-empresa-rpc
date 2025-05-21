@@ -1,92 +1,89 @@
+function generateXML() {
+  const input = document.getElementById("inputData").value.trim();
+  const lines = input.split("\n").filter(line => line.trim() !== "");
 
-function generarXML() {
-    const fileInput = document.getElementById('excelFile');
-    const file = fileInput.files[0];
-    if (!file) {
-        alert('Por favor, sube un archivo Excel.');
-        return;
+  const grupos = {};
+
+  for (const line of lines) {
+    const [
+      idAccion, idGrupo, nif, tipoDoc, email, telefono,
+      catProf, nivelEst, diploma, directos, indirectos, salariales,
+      mes1, importe1, mes2, importe2
+    ] = line.split("\t");
+
+    const grupoId = `${idAccion}_${idGrupo}`;
+    if (!grupos[grupoId]) {
+      grupos[grupoId] = {
+        idAccion, idGrupo,
+        participantes: [],
+        costes: {
+          directos, indirectos, salariales,
+          periodos: [
+            { mes: mes1, importe: importe1 },
+            { mes: mes2, importe: importe2 }
+          ]
+        }
+      };
     }
 
-    const reader = new FileReader();
-    reader.onload = function (e) {
-        const data = new Uint8Array(e.target.result);
-        const workbook = XLSX.read(data, { type: 'array' });
-        const sheet = workbook.Sheets[workbook.SheetNames[0]];
-        const json = XLSX.utils.sheet_to_json(sheet, { defval: "" });
+    grupos[grupoId].participantes.push({
+      nif,
+      N_TIPO_DOCUMENTO: tipoDoc,
+      ERTE_RD_ley: "false",
+      email,
+      telefono,
+      discapacidad: "false",
+      afectadosTerrorismo: "false",
+      afectadosViolenciaGenero: "false",
+      categoriaprofesional: catProf,
+      nivelestudios: nivelEst,
+      DiplomaAcreditativo: diploma,
+      fijoDiscontinuo: "false"
+    });
+  }
 
-        const xmlParts = ['<?xml version="1.0" encoding="UTF-8"?>', '<grupos>'];
+  let xml = `<?xml version="1.0" encoding="UTF-8"?>\n<grupos>\n`;
 
-        const grupos = {};
-        json.forEach(row => {
-            const idAccion = row['idAccion'];
-            const idGrupo = row['idGrupo'];
+  for (const grupo of Object.values(grupos)) {
+    xml += `  <grupo>\n`;
+    xml += `    <idAccion>${grupo.idAccion}</idAccion>\n`;
+    xml += `    <idGrupo>${grupo.idGrupo}</idGrupo>\n`;
+    xml += `    <participantes>\n`;
+    for (const p of grupo.participantes) {
+      xml += `      <participante>\n`;
+      xml += `        <nif>${p.nif}</nif>\n`;
+      xml += `        <N_TIPO_DOCUMENTO>${p.N_TIPO_DOCUMENTO}</N_TIPO_DOCUMENTO>\n`;
+      xml += `        <ERTE_RD_ley>${p.ERTE_RD_ley}</ERTE_RD_ley>\n`;
+      xml += `        <email>${p.email}</email>\n`;
+      xml += `        <telefono>${p.telefono}</telefono>\n`;
+      xml += `        <discapacidad>${p.discapacidad}</discapacidad>\n`;
+      xml += `        <afectadosTerrorismo>${p.afectadosTerrorismo}</afectadosTerrorismo>\n`;
+      xml += `        <afectadosViolenciaGenero>${p.afectadosViolenciaGenero}</afectadosViolenciaGenero>\n`;
+      xml += `        <categoriaprofesional>${p.categoriaprofesional}</categoriaprofesional>\n`;
+      xml += `        <nivelestudios>${p.nivelestudios}</nivelestudios>\n`;
+      xml += `        <DiplomaAcreditativo>${p.DiplomaAcreditativo}</DiplomaAcreditativo>\n`;
+      xml += `        <fijoDiscontinuo>${p.fijoDiscontinuo}</fijoDiscontinuo>\n`;
+      xml += `      </participante>\n`;
+    }
+    xml += `    </participantes>\n`;
+    xml += `    <costes>\n`;
+    xml += `      <coste>\n`;
+    xml += `        <directos>${grupo.costes.directos}</directos>\n`;
+    xml += `        <indirectos>${grupo.costes.indirectos}</indirectos>\n`;
+    xml += `        <salariales>${grupo.costes.salariales}</salariales>\n`;
+    xml += `        <periodos>\n`;
+    for (const periodo of grupo.costes.periodos) {
+      xml += `          <periodo>\n`;
+      xml += `            <mes>${periodo.mes}</mes>\n`;
+      xml += `            <importe>${periodo.importe}</importe>\n`;
+      xml += `          </periodo>\n`;
+    }
+    xml += `        </periodos>\n`;
+    xml += `      </coste>\n`;
+    xml += `    </costes>\n`;
+    xml += `  </grupo>\n`;
+  }
 
-            const key = `${idAccion}_${idGrupo}`;
-            if (!grupos[key]) {
-                grupos[key] = {
-                    participantes: [],
-                    costes: {
-                        directos: row['costeDirecto'] || "0.00",
-                        indirectos: row['costeIndirecto'] || "0.00",
-                        salariales: row['costeSalarial'] || "0.00"
-                    }
-                };
-            }
+  xml += `</grupos>`;
 
-            grupos[key].participantes.push({
-                nif: row['nif'],
-                tipoDoc: row['tipoDocumento'],
-                email: row['email'],
-                telefono: row['telefono'],
-                categoria: row['categoriaProfesional'],
-                estudios: row['nivelEstudios'],
-                diploma: row['diploma']
-            });
-        });
-
-        for (const key in grupos) {
-            const [idAccion, idGrupo] = key.split('_');
-            const grupo = grupos[key];
-
-            xmlParts.push('  <grupo>');
-            xmlParts.push(`    <idAccion>${idAccion}</idAccion>`);
-            xmlParts.push(`    <idGrupo>${idGrupo}</idGrupo>`);
-
-            xmlParts.push('    <participantes>');
-            grupo.participantes.forEach(p => {
-                xmlParts.push('      <participante>');
-                xmlParts.push(`        <nif>${p.nif}</nif>`);
-                xmlParts.push(`        <N_TIPO_DOCUMENTO>${p.tipoDoc}</N_TIPO_DOCUMENTO>`);
-                xmlParts.push(`        <email>${p.email}</email>`);
-                xmlParts.push(`        <telefono>${p.telefono}</telefono>`);
-                xmlParts.push(`        <categoriaprofesional>${p.categoria}</categoriaprofesional>`);
-                xmlParts.push(`        <nivelestudios>${p.estudios}</nivelestudios>`);
-                xmlParts.push(`        <DiplomaAcreditativo>${p.diploma}</DiplomaAcreditativo>`);
-                xmlParts.push('      </participante>');
-            });
-            xmlParts.push('    </participantes>');
-
-            xmlParts.push('    <costes>');
-            xmlParts.push('      <coste>');
-            xmlParts.push(`        <directos>${grupo.costes.directos}</directos>`);
-            xmlParts.push(`        <indirectos>${grupo.costes.indirectos}</indirectos>`);
-            xmlParts.push(`        <salariales>${grupo.costes.salariales}</salariales>`);
-            xmlParts.push('      </coste>');
-            xmlParts.push('    </costes>');
-
-            xmlParts.push('  </grupo>');
-        }
-
-        xmlParts.push('</grupos>');
-
-        const blob = new Blob([xmlParts.join("\n")], { type: 'application/xml' });
-        const url = URL.createObjectURL(blob);
-        const link = document.getElementById('downloadLink');
-        link.href = url;
-        link.download = 'finalizacion_fundae.xml';
-        link.style.display = 'inline-block';
-        link.textContent = 'Descargar XML';
-    };
-
-    reader.readAsArrayBuffer(file);
-}
+  document.getElementById("output").textContent = xml;
