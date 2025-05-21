@@ -1,17 +1,21 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Simulador XML Finalización</title>
-  <link rel="stylesheet" href="style.css" />
+    <meta charset="UTF-8">
+    <title>Simulador XML Finalización FUNDAE</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="libs/xlsx.full.min.js"></script>
+    <script defer src="script.js"></script>
 </head>
 <body>
-  <h1>Simulador XML Finalización de Grupos</h1>
-  <input type="file" id="excelFile" accept=".xlsx" />
-  <button onclick="generarXML()">Generar XML</button>
-  <pre id="output"></pre>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-  <script src="script.js"></script>
+    <div class="container">
+        <h1>Simulador XML Finalización FUNDAE</h1>
+        <p>Sube tu plantilla Excel para generar automáticamente el XML compatible con FUNDAE.</p>
+        <input type="file" id="excelFile" accept=".xlsx">
+        <button onclick="convertToXML()">Convertir a XML</button>
+        <a id="downloadLink" style="display:none;" download="finalizacion.xml">Descargar XML</a>
+        <pre id="output"></pre>
+    </div>
 </body>
 </html>
